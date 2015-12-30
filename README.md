@@ -9,6 +9,7 @@ interface definition for Jeff Mesnil's excellent STOMP.js JavaScript library,
 a STOMPService which subscribes to messages, and an example 'raw data' 
 component which uses the Observable type to data-bind messages to the DOM.
 
+
 ## Quick Start 
 
 To get started running this app locally (assuming you've already got node.js &
@@ -71,3 +72,16 @@ Two extra directories will be generated: `dist` for the compiled app, and
 The example data streaming component provides a demonstration of how to use the
 STOMPService to subscribe to a data stream.
 
+The STOMPService makes available an Observable which the RawDataComponent uses 
+in its own template, and additionally subscribes its' own on_next method to.
+
+The instantiating component must provide an instance of STOMPService. This
+implementation also uses a ConfigService to retrieve the STOMP connection
+variables.
+
+# TODO
+
+* Error Handling - if the connection fails there is currently no feedback to the
+  user of the application (or any indication whatsoever if you're not watching
+  the terminal). The seeds of this are implemented following the model used in 
+  this [Angular2 stocks app](https://github.com/jeffbcross/aim).

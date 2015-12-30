@@ -2,7 +2,6 @@ import { Injectable } from 'angular2/core';
 import { Http } from 'angular2/http';
 
 import { STOMPConfig } from './config.ts';
-import { DEV_CONFIG }  from './dev-config';
 
 /**
  * An injected class which grabs the application

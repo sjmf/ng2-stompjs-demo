@@ -5,7 +5,6 @@ import { Subject } from 'rxjs/Rx'
 import { BehaviorSubject } from 'rxjs/subject/BehaviorSubject';
 
 import { STOMPConfig } from './config';
-import { ConfigService } from './config.service';
 
 import { Client, Message } from 'stompjs';
 declare var Stomp; // Shut up, compiler
@@ -46,24 +45,20 @@ export class STOMPService {
     private client: Client;
 
 
-    /** Constructor taking a ConfigService provider from Angular */
-    public constructor(private _configService: ConfigService) {
+    /** Constructor */
+    public constructor() {
         this.messages = new Subject<Message>();
         this.state = new BehaviorSubject<STOMPState>(STOMPState.CLOSED);
     }
 
 
-    /** Resolve configuration variables */
-    public configure() : Promise<STOMPConfig|void> {
-        if(this.config != null)
-            return Promise.reject(new Error("STOMPService Configuration failed :("));
+    /** Set up configuration */
+    public configure(config:STOMPConfig): Error|void {
+        if (this.state.getValue() != STOMPState.CLOSED)
+            return Error("Already running!");
         
-        // Retrieve our configuration
-        return Promise.resolve(
-            this._configService.getConfig().then(
-                config => this.config = config
-            )
-        );
+        // Set our configuration
+        this.config = config;
     }
 
 

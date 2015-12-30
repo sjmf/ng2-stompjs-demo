@@ -16,7 +16,7 @@ import {ConfigService} from '../services/config.service';
  *  additionally subscribes its' own on_next method to.
  *  
  *  The instantiating component must provide an instance 
- *  of STOMPService (which in turn requires ConfigService)
+ *  of STOMPService.
  */
 @Component({
     selector: 'rawdata',
@@ -49,11 +49,18 @@ export class RawDataComponent implements OnInit {
     // A count of messages received
     public count: number = 0;
 
-    constructor(private _stompService: STOMPService) { }
+    /** Constructor */
+    constructor(private _stompService: STOMPService, 
+                private _configService: ConfigService ) { }
 
     ngOnInit() {
-        this._stompService.configure().then(
-            _stompService => this._stompService.connect(this.on_connect)
+        // Get configuration from config service...
+        this._configService.getConfig().then(
+            config => {
+                // ... then pass it to (and connect) STOMP:
+                this._stompService.configure(config);
+                this._stompService.connect(this.on_connect);
+            }
         );
     }
 
