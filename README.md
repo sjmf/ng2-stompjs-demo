@@ -85,3 +85,12 @@ variables.
   user of the application (or any indication whatsoever if you're not watching
   the terminal). The seeds of this are implemented following the model used in 
   this [Angular2 stocks app](https://github.com/jeffbcross/aim).
+
+# Contributing
+
+Very happy to accept suggestions for improvement (or even pull requests!). This
+project represents my first run-in with Typescript and Angular 2, so while I
+feel like I've learned a lot it's possible that I've messed up somewhere. Raise
+an issue and let me know!
+
+
