@@ -12,8 +12,14 @@ component which uses the Observable type to data-bind messages to the DOM.
 
 ## Quick Start 
 
-To get started running this app locally (assuming you've already got node.js &
-Typescript installed):
+> As well as the following, you will also need the appropriate toolchain for 
+> Typescript, and a message queue supporting STOMP, the Simple Text Oriented 
+> Messaging Protocol. This example was built using [RabbitMQ WebSTOMP](http://www.rabbitmq.com/blog/2012/05/14/introducing-rabbitmq-web-stomp/)
+> but other brokers will also work. (Shameless self-plug: if you want SSL with
+> your RabbitMQ socks, you might want to read [my blog post](https://sjmf.in/wp/?p=86).)
+
+
+To get started running this app locally (assuming you've already got Typescript):
 
 ```bash
 # Clone the repo
@@ -34,12 +40,6 @@ npm start
 ```
 
 Then [http://localhost:3000](http://localhost:3000) should open in your browser.
-
-You will also need the appropriate toolchain for Typescript, and a message queue
-supporting STOMP, the Simple Text Oriented Messaging Protocol. This example was
-built using [RabbitMQ WebSTOMP](http://www.rabbitmq.com/blog/2012/05/14/introducing-rabbitmq-web-stomp/)
-but other brokers will also work. (Shameless self-plug: if you want SSL with
-your RabbitMQ socks, you might want to read [my blog post](https://sjmf.in/wp/?p=86).)
 
 
 ## Layout
