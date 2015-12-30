@@ -60,7 +60,7 @@ export class STOMPService {
         
         // Retrieve our configuration
         return Promise.resolve(
-            this._configService.getDummyConfig().then(
+            this._configService.getConfig().then(
                 config => this.config = config
             )
         );

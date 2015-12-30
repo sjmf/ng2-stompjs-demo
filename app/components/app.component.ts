@@ -1,8 +1,4 @@
 import {Component} from 'angular2/core';
-
-import {STOMPService}  from '../services/stomp.service';
-import {ConfigService} from '../services/config.service';
-
 import {RawDataComponent} from './rawdata.component';
 
 @Component({
@@ -11,10 +7,7 @@ import {RawDataComponent} from './rawdata.component';
         <h1>Angular 2 STOMP.js Demo</h1>
         <rawdata></rawdata>
     `,
-    directives: [RawDataComponent],
-    providers: [STOMPService, ConfigService]
+    directives: [RawDataComponent]
 })
 
-export class AppComponent {
-    constructor(private _stompService: STOMPService) { }
-}
+export class AppComponent { }

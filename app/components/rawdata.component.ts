@@ -1,8 +1,10 @@
 import { Component, OnInit } from 'angular2/core';
+import { Http, HTTP_PROVIDERS } from 'angular2/http';
 import { Observable } from 'rxjs/Observable';
 import { Message } from 'stompjs';
 
 import {STOMPService} from '../services/stomp.service';
+import {ConfigService} from '../services/config.service';
 
 /**
  * This component is an example implementation which uses
@@ -33,7 +35,8 @@ import {STOMPService} from '../services/stomp.service';
             </ol>
 
         </div>
-        `
+        `,
+    providers: [STOMPService, ConfigService, HTTP_PROVIDERS]
 })
 export class RawDataComponent implements OnInit {
 
