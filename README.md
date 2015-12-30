@@ -22,6 +22,13 @@ git clone https://github.com/sjmf/ng2-stompjs-demo
 cd ng2-stompjs-demo
 # Install the packages from package.json
 npm install
+```
+
+You will also need to edit the `app/api/config.json` configuration file to set
+the correct connection parameters for your message broker. When you've done 
+this, you can run the application locally:
+
+```
 # Run the application locally:
 npm start
 ```
