@@ -33,10 +33,4 @@ export class ConfigService {
             .map(res => res.json())
             .toPromise();
     }
-
-
-    /** Return a dummy configuration object */
-    /*getDummyConfig(): Promise<STOMPConfig> {
-        return Promise.resolve(DEV_CONFIG);
-    }*/
 }
