@@ -5,6 +5,7 @@ import { Message } from 'stompjs';
 
 import {STOMPService} from '../services/stomp.service';
 import {ConfigService} from '../services/config.service';
+import {STOMPStatusComponent} from './status.component';
 
 /**
  * This component is an example implementation which uses
@@ -21,6 +22,8 @@ import {ConfigService} from '../services/config.service';
 @Component({
     selector: 'rawdata',
     template: `
+        <stomp-status></stomp-status>
+
         <div id="raw">
 
             <h2>Messages</h2>
@@ -36,7 +39,8 @@ import {ConfigService} from '../services/config.service';
 
         </div>
         `,
-    providers: [STOMPService, ConfigService, HTTP_PROVIDERS]
+    providers: [STOMPService, ConfigService, HTTP_PROVIDERS],
+    directives: [STOMPStatusComponent]
 })
 export class RawDataComponent implements OnInit {
 
@@ -50,8 +54,8 @@ export class RawDataComponent implements OnInit {
     public count: number = 0;
 
     /** Constructor */
-    constructor(private _stompService: STOMPService, 
-                private _configService: ConfigService ) { }
+    constructor(private _stompService: STOMPService,
+        private _configService: ConfigService) { }
 
     ngOnInit() {
         // Get configuration from config service...

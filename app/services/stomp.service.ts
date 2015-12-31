@@ -18,6 +18,15 @@ export enum STOMPState {
     DISCONNECTING
 };
 
+/** look up states for the STOMP service */
+export const StateLookup: string[] = [
+    "CLOSED",
+    "TRYING",
+    "CONNECTED",
+    "SUBSCRIBED",
+    "DISCONNECTING"
+];
+
 /**
  * Angular2 STOMP Service using stomp.js
  *
