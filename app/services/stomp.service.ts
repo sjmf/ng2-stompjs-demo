@@ -65,14 +65,23 @@ export class STOMPService {
 
 
     /** Set up configuration */
-    public configure(config: STOMPConfig, callback: () => any): Error | void {
+    public configure(config?: STOMPConfig, callback?: () => any): void {
 
+        // Check for errors:
         if (this.state.getValue() != STOMPState.CLOSED)
-            return Error("Already running!");
+            throw Error("Already running!");
+        if (config === null && this.config === null)
+            throw Error("No configuration provided!");
         
         // Set our configuration
-        this.config = config;
+        if(config != null)
+            this.config = config;
 
+        // Store calling class callback
+        if (callback != null)
+            this.connect_callback = callback;
+
+        // Connecting via SSL Websocket?
         var scheme: string = 'ws';
         if (this.config.ssl) scheme = 'wss';
 
@@ -90,25 +99,20 @@ export class STOMPService {
 
         // Set function to debug print messages
         this.client.debug = this.debug;
-
-        // Store calling class callback
-        this.connect_callback = callback;
     }
 
 
     /** Perform connection to STOMP broker */
-    public try_connect(): Error | void {
+    public try_connect():  void {
 
         if (this.client === null)
-            return Error("Client not configured!");
+            throw Error("Client not configured!");
 
+        // Attempt connection, passing in a callback 
         this.client.connect(
             this.config.user, 
-            this.config.pass, 
-            () => {
-                this.on_connect();
-                this.connect_callback();
-            }, 
+            this.config.pass,
+            this.on_connect,
             this.on_error
         );
 
@@ -120,9 +124,11 @@ export class STOMPService {
     /** Disconnect the STOMP client and clean up */
     public disconnect(message?: string) {
 
+        // Notify observers that we are disconnecting!
         this.state.next( STOMPState.DISCONNECTING );
+
+        // Disconnect. Callback will set CLOSED state
         this.client.disconnect(
-            // Callback will set CLOSED state
             () => this.state.next( STOMPState.CLOSED ),
             message
         );
@@ -165,19 +171,41 @@ export class STOMPService {
     }
 
 
+    // Callback run on successfully connecting to server
     public on_connect = () => {
 
+        // Indicate our connected state to observers
         this.state.next( STOMPState.CONNECTED );
+
+        // Subscribe to message queues
         this.subscribe();
+
+        // Run the component's callback
+        this.connect_callback();
     }
 
 
+    // Handle errors from stomp.js
     public on_error = (error: string) => {
 
         console.error('Error: ' + error);
+
+        // Check for dropped connection and try reconnecting
+        if (error.indexOf("Lost connection") != -1) {
+
+            // Reset state indicator
+            this.state.next( STOMPState.CLOSED );
+
+            console.log("Reconnecting in 5 seconds...");
+            setTimeout(() => { 
+                this.configure();
+                this.try_connect();
+            }, 5000);
+        }
     }
 
 
+    // On message RX, notify the Observable with the message object
     public on_message = (message: Message) => {
 
         if (message.body) {
