@@ -53,6 +53,9 @@ export class STOMPService {
     // STOMP Client from stomp.js
     private client: Client;
 
+    // Callback function (provided by calling class) to run when connected
+    private connect_callback: () => any;
+
 
     /** Constructor */
     public constructor() {
@@ -62,41 +65,49 @@ export class STOMPService {
 
 
     /** Set up configuration */
-    public configure(config:STOMPConfig): Error|void {
+    public configure(config: STOMPConfig, callback: () => any): Error | void {
+
         if (this.state.getValue() != STOMPState.CLOSED)
             return Error("Already running!");
         
         // Set our configuration
         this.config = config;
-    }
-
-
-    /** Perform connection to STOMP broker */
-    public connect(callback:any): void {
-        if (this.client != null)
-            return;
 
         var scheme: string = 'ws';
         if (this.config.ssl) scheme = 'wss';
 
+        // Attempt connection, passing in a callback
         this.client = Stomp.client(
             scheme + '://'
-            + this.config.host + ':' 
-            + this.config.port 
+            + this.config.host + ':'
+            + this.config.port
             + '/stomp/websocket'
         );
 
+        // Configure client heartbeating
         this.client.heartbeat.incoming = this.config.heartbeat_in;
         this.client.heartbeat.outgoing = this.config.heartbeat_out;
-        
+
+        // Set function to debug print messages
         this.client.debug = this.debug;
+
+        // Store calling class callback
+        this.connect_callback = callback;
+    }
+
+
+    /** Perform connection to STOMP broker */
+    public try_connect(): Error | void {
+
+        if (this.client === null)
+            return Error("Client not configured!");
 
         this.client.connect(
             this.config.user, 
             this.config.pass, 
             () => {
                 this.on_connect();
-                callback();
+                this.connect_callback();
             }, 
             this.on_error
         );
@@ -107,7 +118,8 @@ export class STOMPService {
 
 
     /** Disconnect the STOMP client and clean up */
-    public disconnect(message?:string) {
+    public disconnect(message?: string) {
+
         this.state.next( STOMPState.DISCONNECTING );
         this.client.disconnect(
             // Callback will set CLOSED state
@@ -119,6 +131,7 @@ export class STOMPService {
 
     /** Send a message to all topics */
     public publish(message: string) {
+
         for (var t of this.config.publish)
             this.client.send(t, {}, message);
     }
@@ -126,6 +139,7 @@ export class STOMPService {
 
     /** Subscribe to server message queues */
     private subscribe(): void {
+
         // Subscribe to our configured queues
         for (var t of this.config.subscribe)
             this.client.subscribe(t, this.on_message, <any>{ ack: 'auto' });
@@ -142,7 +156,8 @@ export class STOMPService {
      * Note the method signature: () => preserves lexical scope
      * if we need to use this.x inside the function
      */
-    public debug(...args:any[]) {
+    public debug(...args: any[]) {
+
         // Push arguments to this function into console.log
         if (window.console && console.log && console.log.apply) {
             console.log.apply(console, args);
@@ -151,20 +166,24 @@ export class STOMPService {
 
 
     public on_connect = () => {
+
         this.state.next( STOMPState.CONNECTED );
         this.subscribe();
     }
 
 
     public on_error = (error: string) => {
+
         console.error('Error: ' + error);
     }
 
 
     public on_message = (message: Message) => {
-        if (message.body)
+
+        if (message.body) {
             this.messages.next(message);
-        else
+        } else {
             console.error("Empty message received!");
+        }
     }
 }

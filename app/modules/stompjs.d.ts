@@ -15,10 +15,10 @@ declare module "stompjs" {
 		debug(...args: string[]);
 
 		connect(...args: any[]);
-		disconnect(disconnectCallback: any, headers?: any);
+		disconnect(disconnectCallback: () => any, headers?: any);
 
 		send(destination: string, headers?:any, body?: string);
-		subscribe(destination: string, callback?: any, body?: string);
+		subscribe(destination: string, callback?: (message: Message) => any, body?: string);
 		unsubscribe();
 
 		begin(transaction: string);

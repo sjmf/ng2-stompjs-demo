@@ -62,14 +62,14 @@ export class RawDataComponent implements OnInit {
         this._configService.getConfig().then(
             config => {
                 // ... then pass it to (and connect) STOMP:
-                this._stompService.configure(config);
-                this._stompService.connect(this.on_connect);
+                this._stompService.configure(config, this.on_connect);
+                this._stompService.try_connect();
             }
         );
     }
 
     /** Callback on_connect to queue */
-    public on_connect = (message: Message) => {
+    public on_connect = () => {
 
         // Store local reference to Observable
         // for use with template ( | async )
