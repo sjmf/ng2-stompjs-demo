@@ -80,10 +80,10 @@ Two extra directories will be generated: `dist` for the compiled app, and
 
 The example data streaming component provides a demonstration of how to use the
 STOMPService to subscribe to a data stream. At its' core, the STOMPService makes
-available an Observable which the RawDataComponent uses in its own template, and 
-additionally subscribes its' own on_next method to.
+available an Observable which the `RawDataComponent` uses in its own template, 
+and additionally subscribes its' own `on_next` method to.
 
-A barebones set-up of the service would usually run from a component's `ngOnInit`
+A barebones set-up of the service could run from a component's `ngOnInit`
 method, and might look something like this:
 ```
 this._stompService.configure( config, () => console.log("connected") );
@@ -112,4 +112,9 @@ project represents my first run-in with Typescript and Angular 2, so while I
 feel like I've learned a lot it's possible that I've messed up somewhere. Raise
 an issue and let me know!
 
+
+## Licence
+
+MIT Licence. Essentially: do what you like with it, but give credit if credit's 
+due, and it's not my fault if this code eats your product/machine/whatever.
 
