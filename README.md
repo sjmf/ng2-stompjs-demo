@@ -48,10 +48,11 @@ The source is located under the `app` folder:
 
 ```
 ├── README.md                        * This readme
+│
+├── api                              * Example API (static for demo)
+│   └── config.json                  * Configuration file for STOMP
+│
 ├── app                              * Source folder
-│   ├── api
-│   │   └── config.json              * Configuration file for STOMP
-│   │
 │   ├── boot.ts                      * boot.ts for SystemJS bootstrap
 │   │
 │   ├── components
