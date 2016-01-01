@@ -16,7 +16,7 @@ import { STOMPConfig } from './config.ts';
 @Injectable()
 export class ConfigService {
 
-    private static API_URL: string = 'app/api/config.json';
+    private static API_URL: string = 'api/config.json';
       
     // TODO: Provide a user object to the constructor
     //       to allow retrieval of per-user configs
