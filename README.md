@@ -74,26 +74,37 @@ The source is located under the `app` folder:
 Two extra directories will be generated: `dist` for the compiled app, and 
 `node_modules`, for installed node packages.
 
+
 ## Extending
 
 The example data streaming component provides a demonstration of how to use the
-STOMPService to subscribe to a data stream.
+STOMPService to subscribe to a data stream. At its' core, the STOMPService makes
+available an Observable which the RawDataComponent uses in its own template, and 
+additionally subscribes its' own on_next method to.
 
-The STOMPService makes available an Observable which the RawDataComponent uses 
-in its own template, and additionally subscribes its' own on_next method to.
+A barebones set-up of the service would usually run from a component's `ngOnInit`
+method, and might look something like this:
+```
+this._stompService.configure( config, () => console.log("connected") );
+this._stompService.try_connect();
+```
+
+Our `RawDataComponent` then copies a reference to the public member `messages`,
+which can be used with a template variable and the `|async` pipe to update the
+template in real time.
 
 The instantiating component must provide an instance of STOMPService. This
 implementation also uses a ConfigService to retrieve the STOMP connection
-variables.
+variables from a json file, with the intention that other clients might like to
+route this request to an API along with some form of user token.
 
-# TODO
+The STOMP connection status is also fed-back to the application user via a
+`BehaviorSubject` observable, implemented following the model used in 
+this [Angular2 stocks app](https://github.com/jeffbcross/aim). If the connection
+fails, the application will retry every 5 seconds until it reopens.
 
-* Error Handling - if the connection fails there is currently no feedback to the
-  user of the application (or any indication whatsoever if you're not watching
-  the terminal). The seeds of this are implemented following the model used in 
-  this [Angular2 stocks app](https://github.com/jeffbcross/aim).
 
-# Contributing
+## Contributing
 
 Very happy to accept suggestions for improvement (or even pull requests!). This
 project represents my first run-in with Typescript and Angular 2, so while I
