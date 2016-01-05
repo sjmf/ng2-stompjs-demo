@@ -1,4 +1,4 @@
-import { Component, OnInit } from 'angular2/core';
+import { Component, OnInit, OnDestroy } from 'angular2/core';
 import { Http, HTTP_PROVIDERS } from 'angular2/http';
 import { Observable } from 'rxjs/Observable';
 import { Message } from 'stompjs';
@@ -42,7 +42,7 @@ import {STOMPStatusComponent} from './status.component';
     providers: [STOMPService, ConfigService, HTTP_PROVIDERS],
     directives: [STOMPStatusComponent]
 })
-export class RawDataComponent implements OnInit {
+export class RawDataComponent implements OnInit, OnDestroy {
 
     // Stream of messages
     public messages: Observable<Message>;
@@ -66,6 +66,10 @@ export class RawDataComponent implements OnInit {
                 this._stompService.try_connect();
             }
         );
+    }
+
+    ngOnDestroy() {
+        this._stompService.disconnect();
     }
 
     /** Callback on_connect to queue */
