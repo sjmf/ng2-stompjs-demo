@@ -53,9 +53,8 @@ export class STOMPService {
     // STOMP Client from stomp.js
     private client: Client;
 
-    // Callback function (provided by calling class) to run when connected
-    private connect_callback: () => any;
-
+    // Resolve Promise made to calling class, when connected
+    private resolvePromise: { (...args: any[]): void };
 
     /** Constructor */
     public constructor() {
@@ -65,7 +64,7 @@ export class STOMPService {
 
 
     /** Set up configuration */
-    public configure(config?: STOMPConfig, callback?: () => any): void {
+    public configure(config?: STOMPConfig): void {
 
         // Check for errors:
         if (this.state.getValue() != STOMPState.CLOSED)
@@ -76,10 +75,6 @@ export class STOMPService {
         // Set our configuration
         if(config != null)
             this.config = config;
-
-        // Store calling class callback
-        if (callback != null)
-            this.connect_callback = callback;
 
         // Connecting via SSL Websocket?
         var scheme: string = 'ws';
@@ -102,22 +97,31 @@ export class STOMPService {
     }
 
 
-    /** Perform connection to STOMP broker */
-    public try_connect():  void {
+    /** 
+     * Perform connection to STOMP broker, returning a Promise
+     * which is resolved when connected. 
+     */
+    public try_connect(): Promise<{}> {
 
-        if (this.client === null)
+        if(this.state.getValue() != STOMPState.CLOSED)
+            throw Error("Can't try_connect if not CLOSED!");
+        if(this.client === null)
             throw Error("Client not configured!");
 
         // Attempt connection, passing in a callback 
         this.client.connect(
-            this.config.user, 
+            this.config.user,
             this.config.pass,
             this.on_connect,
             this.on_error
         );
 
         console.log("connecting...");
-        this.state.next( STOMPState.TRYING );
+        this.state.next(STOMPState.TRYING);
+
+        return new Promise(
+            (resolve, reject) => this.resolvePromise = resolve
+        );
     }
 
 
@@ -180,8 +184,11 @@ export class STOMPService {
         // Subscribe to message queues
         this.subscribe();
 
-        // Run the component's callback
-        this.connect_callback();
+        // Resolve our Promise to the caller
+        this.resolvePromise();
+
+        // Clear callback
+        this.resolvePromise = null;
     }
 
 
@@ -196,6 +203,7 @@ export class STOMPService {
             // Reset state indicator
             this.state.next( STOMPState.CLOSED );
 
+            // Attempt reconnection
             console.log("Reconnecting in 5 seconds...");
             setTimeout(() => { 
                 this.configure();

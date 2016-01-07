@@ -62,8 +62,8 @@ export class RawDataComponent implements OnInit, OnDestroy {
         this._configService.getConfig().then(
             config => {
                 // ... then pass it to (and connect) STOMP:
-                this._stompService.configure(config, this.on_connect);
-                this._stompService.try_connect();
+                this._stompService.configure(config);
+                this._stompService.try_connect().then(this.on_connect);
             }
         );
     }
