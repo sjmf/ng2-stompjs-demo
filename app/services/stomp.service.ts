@@ -6,8 +6,7 @@ import { BehaviorSubject } from 'rxjs/subject/BehaviorSubject';
 
 import { STOMPConfig } from './config';
 
-import { Client, Message } from 'stompjs';
-declare var Stomp; // Shut up, compiler
+import { Client, Message, Stomp } from 'stompjs';
 
 /** possible states for the STOMP service */
 export enum STOMPState {
