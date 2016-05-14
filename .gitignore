@@ -1,4 +1,4 @@
 node_modules
 dist
 app/services/dev-config.ts
-app/api/config.json
+api/config.json
