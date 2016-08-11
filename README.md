@@ -9,6 +9,7 @@ interface definition for Jeff Mesnil's excellent STOMP.js JavaScript library,
 a STOMPService which subscribes to messages, and an example 'raw data' 
 component which uses the Observable type to data-bind messages to the DOM.
 
+For a newer demo using MQTT instead of STOMP, see [https://github.com/sjmf/ng2-mqtt-demo](https://github.com/sjmf/ng2-mqtt-demo)
 
 ## Quick Start 
 
