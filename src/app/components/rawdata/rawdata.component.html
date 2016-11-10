@@ -1,0 +1,16 @@
+<app-status></app-status>
+
+<div id="raw">
+
+  <h2>Messages</h2>
+  <p>{{count}} total</p>
+
+  <h3 *ngIf="count">Latest:</h3>
+  <pre>{{messages | async}}</pre>
+
+  <h3 *ngIf="mq.length">History:</h3>
+  <ol>
+    <li *ngFor="let m of mq">{{m}}</li>
+  </ol>
+
+</div>
