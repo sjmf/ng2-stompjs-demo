@@ -1,7 +1,8 @@
 # STOMP.js Angular 2 Demo App
 
-> A demo application using [Angular 2](https://github.com/angular/angular)+
-[Typescript](https://github.com/Microsoft/TypeScript), and [STOMP.js](https://github.com/jmesnil/stomp-websocket).
+> A demo application using [Angular 2](https://github.com/angular/angular) in
+[Typescript](https://github.com/Microsoft/TypeScript) and [STOMP.js](https://github.com/jmesnil/stomp-websocket),
+> generated with [angular-cli](https://github.com/angular/angular-cli).
 
 This demo app implements a more ng2-faithful way of connecting to a message 
 queue and subscribing to messages from a STOMP topic. Includes a Typescript 
@@ -35,12 +36,15 @@ You will also need to edit the `app/api/config.json` configuration file to set
 the correct connection parameters for your message broker. When you've done 
 this, you can run the application locally:
 
-```
-# Run the application locally:
+```bash
+# Run the application locally
 npm start
 ```
 
-Then [http://localhost:3000](http://localhost:3000) should open in your browser.
+Then [http://localhost:4200](http://localhost:4200) should open in your browser.
+The app will automatically reload if you change any of the source files.
+
+> You can overrride the default port by changing it in the `.emebr-cli` file. 
 
 
 ## Layout
@@ -48,33 +52,75 @@ Then [http://localhost:3000](http://localhost:3000) should open in your browser.
 The source is located under the `app` folder:
 
 ```
-├── README.md                        * This readme
+├── e2e                                          * End To End testing folder
+│   ├── app.e2e-spec.ts                          * App behaviour testings
+│   ├── app.po.ts                                * App behavior definitions
+│   └── tsconfig.json                            * Typescript transpiler options
 │
-├── api                              * Example API (static for demo)
-│   └── config.json                  * Configuration file for STOMP
+├── src                                          * Source folder
+│   ├── api                                      * Example API folder (static for demo)
+│   │   └── config.json                          * Configuration file for STOMP
+│   │
+│   ├── app                                      * Application folder
+│   │   ├── components                           * Components folder
+│   │   │   ├── rawdata                          * Data streaming component folder
+│   │   │       ├── rawdata.component.css        * Component css file
+│   │   │       ├── rawdata.component.html       * Component html file
+│   │   │       ├── rawdata.component.spec.ts    * Component testings
+│   │   │   │   └── rawdata.component.ts         * Example data streaming component
+│   │   │   │
+│   │   │   └── status                           * Status component folder
+│   │   │       ├── status.component.css         * Component css file
+│   │   │       ├── status.component.html        * Component html file
+│   │   │       ├── status.component.spec.ts     * Component testings
+│   │   │       └── status.component.ts          * STOMP Status component
+│   │   │
+│   │   ├── services                             * Services folder
+│   │   │   ├── config                           * Config service folder
+│   │   │   │   ├── config.service.spec.ts       * Service testings
+│   │   │   │   └── config.service.ts            * Service which retrieves the configuration
+│   │   │   │
+│   │   │   └── stomp                            * STOMP service folder
+│   │   │       ├── index.ts                     * Indexing file
+│   │   │       ├── stomp.config.ts              * Type definition for a STOMP configuration
+│   │   │       ├── stomp.service.spec.ts        * Service testing
+│   │   │       └── stomp.service.ts             * STOMP ng2 service definition
+│   │   │
+│   │   ├── app.component.css                    * Component css file
+│   │   ├── app.component.html                   * Component html file
+│   │   ├── app.component.spec.ts                * Component testings
+│   │   ├── app.component.ts                     * Top-level app-root component
+│   │   ├── app.module.ts                        * App module definition
+│   │   └── index.ts                             * Indexing file
+│   │
+│   ├── assets                                   * Assets folder
+│   │   └── .gitkeep                             * Placeholder to include the folder to source control
+│   │
+│   ├── environments                             * Environment settings folder
+│   │   ├── environment.prod.ts                  * Production environment settings
+│   │   └── environment.ts                       * Development environment settings
+│   │
+│   ├── favicon.ico                              * App favorite icon
+│   ├── index.html                               * The root page served to browser
+│   ├── main.ts                                  * App bootstrap
+│   ├── polyfills.ts                             *  
+│   ├── styles.css                               * Main css file
+│   ├── test.ts                                  * Testings bootstrap
+│   ├── tsconfig.json                            * Typescript transpiler options 
+│   └── typings.d.ts                             * Typescript typings definition file
 │
-├── app                              * Source folder
-│   ├── boot.ts                      * boot.ts for SystemJS bootstrap
-│   │
-│   ├── components
-│   │   ├── app.component.ts         * Top-level my-app component
-│   │   └── rawdata.component.tsp    * Example data streaming component
-│   │
-│   ├── modules
-│   │   └── stompjs.d.ts             * STOMP.js Typescript interface exports
-│   │
-│   └── services
-│       ├── config.service.ts        * Service which retrieves /api/config.json
-│       ├── config.ts                * Type definition for a STOMP configuration
-│       └── stomp.service.ts         * STOMP ng2 service definition
-│
-├── index.html                       * App page served to browser
-├── package.json                     * npm list of packages to install
-└── tsconfig.json                    * Typescript transpiler options
+├── .editorconfig                                * Editor configuration file
+├── .gitignore                                   * Git ignore file
+├── README.md                                    * This file
+├── angular-cli.json                             * Angular CLI configuration file
+├── karma.config.js                              * Karma configuration file
+├── package.json                                 * Package info and list of dependencies to install
+├── protractor.config.js                         * Protractor configuration file
+└── tslint.json                                  * Typescript Linter configuration file
 ```
 
-Two extra directories will be generated: `dist` for the compiled app, and 
-`node_modules`, for installed node packages.
+> Two extra directories will be generated: `dist` for the compiled app, and 
+`node_modules`, for the installed node packages.
 
 
 ## Extending
@@ -119,3 +165,28 @@ an issue and let me know!
 MIT Licence. Essentially: do what you like with it, but give credit if credit's 
 due, and it's not my fault if this code eats your product/machine/whatever.
 
+
+## Code scaffolding
+
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class`.
+
+## Build
+
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+
+## Running unit tests
+
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+
+## Running end-to-end tests
+
+Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Before running the tests make sure you are serving the app via `ng serve`.
+
+## Deploying to Github Pages
+
+Run `ng github-pages:deploy` to deploy to Github Pages.
+
+## Further help
+
+To get more help on the `angular-cli` use `ng --help` or go check out the [Angular-CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

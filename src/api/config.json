@@ -10,5 +10,7 @@
     "publish": ["/topic/ng-demo-pub"],
 
     "heartbeat_in": 0,
-    "heartbeat_out": 20000
+    "heartbeat_out": 20000,
+
+    "debug": true
 }
