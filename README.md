@@ -64,9 +64,9 @@ The source is located under the `app` folder:
 │   ├── app                                      * Application folder
 │   │   ├── components                           * Components folder
 │   │   │   ├── rawdata                          * Data streaming component folder
-│   │   │       ├── rawdata.component.css        * Component css file
-│   │   │       ├── rawdata.component.html       * Component html file
-│   │   │       ├── rawdata.component.spec.ts    * Component testings
+│   │   │   │   ├── rawdata.component.css        * Component css file
+│   │   │   │   ├── rawdata.component.html       * Component html file
+│   │   │   │   ├── rawdata.component.spec.ts    * Component testings
 │   │   │   │   └── rawdata.component.ts         * Example data streaming component
 │   │   │   │
 │   │   │   └── status                           * Status component folder
