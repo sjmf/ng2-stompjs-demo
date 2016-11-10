@@ -58,10 +58,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the
 
 ## Layout
 
-The source is located under the `app` folder. Partial tree (excluding `.ts` 
-`.html` etc component files under folders, testing framework files, 
-and the `e2e` End to End testing folder containing app behaviour testings 
-and definitions):
+The source is located under the `app` folder:
 
 ```
 ├── src                                          * Source folder
@@ -102,8 +99,10 @@ and definitions):
 └── tslint.json                                  * Typescript Linter configuration file
 ```
 
-> Excluded from this listing for brevity: .
-> The `node_modules` directory will also be generated for the installed node packages.
+> Excluded from this partial tree for brevity: sub-component `.ts` `.html` etc 
+files under folders, testing framework files, and the `e2e` End to End testing 
+folder containing app behaviour testings and definitions. The `node_modules` 
+directory will also be generated for the installed node packages.)
 
 
 ## Extending
