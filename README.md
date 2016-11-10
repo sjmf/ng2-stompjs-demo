@@ -44,7 +44,7 @@ npm start
 Then [http://localhost:4200](http://localhost:4200) should open in your browser.
 The app will automatically reload if you change any of the source files.
 
-> You can overrride the default port by changing it in the `.emebr-cli` file. 
+> You can override the default port by changing it in the `.ember-cli` file. 
 
 
 ## Layout
