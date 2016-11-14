@@ -22,6 +22,8 @@ export class RawDataComponent implements OnInit, OnDestroy {
   // A count of messages received
   public count: number = 0;
 
+  private _counter: number = 1;
+
   /** Constructor */
   constructor(private _stompService: STOMPService,
     private _configService: ConfigService) { }
@@ -39,6 +41,15 @@ export class RawDataComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._stompService.disconnect();
+  }
+
+  public onClick() {
+    let _getRandomInt = (min, max) => {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    this._stompService.publish(`{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);
+
+    this._counter++;
   }
 
   /** Callback on_connect to queue */
