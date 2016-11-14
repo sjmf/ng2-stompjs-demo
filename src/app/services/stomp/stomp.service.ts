@@ -199,9 +199,13 @@ export class STOMPService {
 
 
   // Handle errors from stomp.js
-  public on_error = (error: string) => {
+  public on_error = (error: string | Stomp.Message) => {
 
-    console.error('Error: ' + error);
+    if (typeof error === 'object') {
+      error = (<Stomp.Message>error).body;
+    }
+
+    console.error(`Error: ${error}`);
 
     // Check for dropped connection and try reconnecting
     if (error.indexOf('Lost connection') !== -1) {
