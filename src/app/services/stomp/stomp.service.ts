@@ -126,7 +126,7 @@ export class STOMPService {
 
 
   /** Disconnect the STOMP client and clean up */
-  public disconnect(message?: string): void {
+  public disconnect(): void {
 
     // Notify observers that we are disconnecting!
     this.state.next(STOMPState.DISCONNECTING);
@@ -134,8 +134,7 @@ export class STOMPService {
     // Disconnect. Callback will set CLOSED state
     if (this.client) {
       this.client.disconnect(
-        () => this.state.next(STOMPState.CLOSED),
-        message
+        () => this.state.next(STOMPState.CLOSED)
       );
     }
   }
