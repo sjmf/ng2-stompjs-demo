@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { STOMPService, StateLookup } from '../../services/stomp';
+import { STOMPService, STOMPState } from '../../services/stomp';
 
 @Component({
   selector: 'app-status',
@@ -17,6 +17,6 @@ export class StatusComponent implements OnInit {
   ngOnInit() {
     console.log('Status init');
     this.state = this._stompService.state
-      .map((state: number) => StateLookup[state]);
+      .map((state: number) => STOMPState[state]);
   }
 }
