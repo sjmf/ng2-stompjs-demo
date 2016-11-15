@@ -45,6 +45,9 @@ export class STOMPService {
   // Resolve Promise made to calling class, when connected
   private resolvePromise: { (...args: any[]): void };
 
+  // Timer
+  private timer: NodeJS.Timer;
+
   /** Constructor */
   public constructor() {
     this.messages = new Subject<Stomp.Message>();
@@ -122,8 +125,14 @@ export class STOMPService {
     // Notify observers that we are disconnecting!
     this.state.next(STOMPState.DISCONNECTING);
 
-    // Disconnect. Callback will set CLOSED state
-    if (this.client) {
+    // Abort reconnecting if in progress
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    // Disconnect if connected. Callback will set CLOSED state
+    if (this.client.connected) {
       this.client.disconnect(
         () => this.state.next(STOMPState.CLOSED)
       );
@@ -186,6 +195,9 @@ export class STOMPService {
 
     // Clear callback
     this.resolvePromise = null;
+
+    // Clear timer
+    this.timer = null;
   }
 
 
@@ -206,7 +218,7 @@ export class STOMPService {
 
       // Attempt reconnection
       console.log('Reconnecting in 5 seconds...');
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.configure();
         this.try_connect();
       }, 5000);
