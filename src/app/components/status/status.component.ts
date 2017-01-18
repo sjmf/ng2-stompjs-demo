@@ -9,7 +9,7 @@ import { STOMPService, STOMPState } from '../../services/stomp';
 })
 export class StatusComponent implements OnInit {
 
-  private state: Observable<string>;
+  public state: Observable<string>;
 
   /** Constructor */
   constructor(private _stompService: STOMPService) { }
