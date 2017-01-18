@@ -44,7 +44,7 @@ export class RawDataComponent implements OnInit, OnDestroy {
   }
 
   public onClick() {
-    let _getRandomInt = (min, max) => {
+    const _getRandomInt = (min, max) => {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
     this._stompService.publish(`{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);

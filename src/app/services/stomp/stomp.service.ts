@@ -43,7 +43,7 @@ export class STOMPService {
   private client: Stomp.Client;
 
   // Resolve Promise made to calling class, when connected
-  private resolvePromise: { (...args: any[]): void };
+  private resolvePromise: (...args: any[]) => void;
 
   // Timer
   private timer: NodeJS.Timer;
@@ -143,7 +143,7 @@ export class STOMPService {
   /** Send a message to all topics */
   public publish(message: string): void {
 
-    for (let t of this.config.publish) {
+    for (const t of this.config.publish) {
       this.client.send(t, {}, message);
     }
   }
@@ -153,7 +153,7 @@ export class STOMPService {
   public subscribe(): void {
 
     // Subscribe to our configured queues
-    for (let t of this.config.subscribe) {
+    for (const t of this.config.subscribe) {
       this.client.subscribe(t, this.on_message, { ack: 'auto' });
     }
 
