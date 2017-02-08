@@ -20,9 +20,9 @@ export class RawDataComponent implements OnInit, OnDestroy {
   public mq: Array<string> = [];
 
   // A count of messages received
-  public count: number = 0;
+  public count = 0;
 
-  private _counter: number = 1;
+  private _counter = 1;
 
   /** Constructor */
   constructor(private _stompService: STOMPService,
