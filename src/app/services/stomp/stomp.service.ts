@@ -132,7 +132,7 @@ export class STOMPService {
     }
 
     // Disconnect if connected. Callback will set CLOSED state
-    if (this.client.connected) {
+    if (this.client && this.client.connected) {
       this.client.disconnect(
         () => this.state.next(STOMPState.CLOSED)
       );
@@ -141,7 +141,7 @@ export class STOMPService {
 
 
   /** Send a message to all topics */
-  public publish(message: string): void {
+  public publish(message?: string): void {
 
     for (const t of this.config.publish) {
       this.client.send(t, {}, message);

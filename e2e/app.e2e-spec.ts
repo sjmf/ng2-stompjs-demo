@@ -7,7 +7,7 @@ describe('ng2-stompjs-demo App', function() {
     page = new Ng2StompjsDemoPage();
   });
 
-  it('should display message saying Angular 2 STOMP.js Demo', () => {
+  it('should display message saying \'Angular 2 STOMP.js Demo\'', () => {
     page.navigateTo();
     expect(page.getHeaderText()).toEqual('Angular 2 STOMP.js Demo');
   });
