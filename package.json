@@ -2,7 +2,6 @@
   "name": "ng2-stompjs-demo",
   "version": "2.1.0",
   "license": "MIT",
-  "angular-cli": {},
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --port 4200 --ssl false",
