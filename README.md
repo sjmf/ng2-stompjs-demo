@@ -90,12 +90,14 @@ The source is located under the `app` folder:
 │   │
 │   ├── index.html                               * The root page served to browser
 │   ├── main.ts                                  * App bootstrap
+│   ├── polyfills.ts                             * Polyfills file
 │   ├── styles.css                               * Main css file
-│   ├── tsconfig.json                            * Typescript transpiler options 
+│   ├── tsconfig.app.json                        * App Typescript transpiler options 
 │   └── typings.d.ts                             * Typescript typings definition file
 │
-├── angular-cli.json                             * Angular CLI configuration file
+├── .angular-cli.json                            * Angular CLI configuration file
 ├── package.json                                 * Package info and list of dependencies to install
+├── tsconfig.json                                * Main Typescript transpiler options 
 └── tslint.json                                  * Typescript Linter configuration file
 ```
 
