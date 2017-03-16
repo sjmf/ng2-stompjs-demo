@@ -110,7 +110,7 @@ export class STOMPService {
       this.on_error
     );
 
-    console.log('Connecting...');
+    this.debug('Connecting...');
     this.state.next(STOMPState.TRYING);
 
     return new Promise(
@@ -173,7 +173,7 @@ export class STOMPService {
   public debug(...args: any[]): void {
 
     // Push arguments to this function into console.log
-    if (window.console && console.log && console.log.apply) {
+    if (console && console.log && console.log.apply) {
       console.log.apply(console, args);
     }
   }
@@ -182,7 +182,7 @@ export class STOMPService {
   // Callback run on successfully connecting to server
   public on_connect = () => {
 
-    console.log('Connected');
+    this.debug('Connected');
 
     // Indicate our connected state to observers
     this.state.next(STOMPState.CONNECTED);
@@ -217,7 +217,7 @@ export class STOMPService {
       this.state.next(STOMPState.CLOSED);
 
       // Attempt reconnection
-      console.log('Reconnecting in 5 seconds...');
+      this.debug('Reconnecting in 5 seconds...');
       this.timer = setTimeout(() => {
         this.configure();
         this.try_connect();
