@@ -1,13 +1,14 @@
 {
-    "host": "example.com.invalid",
-    "port": 15671,
-    "https": true,
+    "host": "127.0.0.1",
+    "port": 15674,
+    "https": false,
+    "path": "ws",
 
-    "user": "username",
-    "pass": "changeme",
+    "user": "guest",
+    "pass": "guest",
 
     "subscribe": ["/topic/ng-demo-sub"],
-    "publish": ["/topic/ng-demo-pub"],
+    "publish": ["/topic/ng-demo-sub"],
 
     "heartbeat_in": 0,
     "heartbeat_out": 20000,

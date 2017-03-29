@@ -6,6 +6,7 @@ export interface StompConfig {
   // Which server?
   host: string;
   port: number;
+  path: string;
   ssl: boolean;
 
   // What credentials?

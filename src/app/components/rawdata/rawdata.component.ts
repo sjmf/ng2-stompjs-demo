@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Message } from 'stompjs';
+import { Message } from '@stomp/stompjs';
 
 import { STOMPService } from '../../services/stomp';
 import { ConfigService } from '../../services/config/config.service';

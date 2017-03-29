@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { StompConfig } from './';
 
-import * as Stomp from 'stompjs';
+import * as Stomp from '@stomp/stompjs';
 
 /** possible states for the STOMP service */
 export enum STOMPState {
@@ -78,7 +78,7 @@ export class STOMPService {
     }
 
     // Attempt connection, passing in a callback
-    this.client = Stomp.client(`${scheme}://${this.config.host}:${this.config.port}/stomp/websocket`);
+    this.client = Stomp.client(`${scheme}://${this.config.host}:${this.config.port}/${this.config.path}`);
 
     // Configure client heartbeating
     this.client.heartbeat.incoming = this.config.heartbeat_in;
