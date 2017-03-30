@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { StompConfig } from './';
 
 import * as Stomp from '@stomp/stompjs';
+import {ConfigService} from "../config/config.service";
 
 /** possible states for the STOMP service */
 export enum STOMPState {
@@ -46,9 +47,18 @@ export class STOMPService {
   private resolvePromise: (...args: any[]) => void;
 
   /** Constructor */
-  public constructor() {
+  public constructor(private _configService: ConfigService) {
     this.messages = new Subject<Stomp.Message>();
     this.state = new BehaviorSubject<STOMPState>(STOMPState.CLOSED);
+
+    // Get configuration from config service...
+    this._configService.getConfig('api/config.json').then(
+      config => {
+        // ... then pass it to (and connect) STOMP:
+        this.configure(config);
+        this.try_connect();
+      }
+    );
   }
 
 
@@ -82,7 +92,7 @@ export class STOMPService {
    * Perform connection to STOMP broker, returning a Promise
    * which is resolved when connected.
    */
-  public try_connect(): Promise<{}> {
+  public try_connect(): void {
 
     if (this.state.getValue() !== STOMPState.CLOSED) {
       throw Error('Can\'t try_connect if not CLOSED!');
@@ -101,10 +111,6 @@ export class STOMPService {
 
     console.log('Connecting...');
     this.state.next(STOMPState.TRYING);
-
-    return new Promise(
-      (resolve, reject) => this.resolvePromise = resolve
-    );
   }
 
 
