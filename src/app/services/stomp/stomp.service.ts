@@ -14,7 +14,7 @@ export enum STOMPState {
   CONNECTED,
   SUBSCRIBED,
   DISCONNECTING
-};
+}
 
 /**
  * Angular2 STOMP Service using stomp.js
@@ -45,9 +45,6 @@ export class STOMPService {
   // Resolve Promise made to calling class, when connected
   private resolvePromise: (...args: any[]) => void;
 
-  // Timer
-  private timer: NodeJS.Timer;
-
   /** Constructor */
   public constructor() {
     this.messages = new Subject<Stomp.Message>();
@@ -58,18 +55,7 @@ export class STOMPService {
   /** Set up configuration */
   public configure(config?: StompConfig): void {
 
-    // Check for errors:
-    if (this.state.getValue() !== STOMPState.CLOSED) {
-      throw Error('Already running!');
-    }
-    if (config === null && this.config === null) {
-      throw Error('No configuration provided!');
-    }
-
-    // Set our configuration
-    if (config != null) {
-      this.config = config;
-    }
+    this.config = config;
 
     // Connecting via SSL Websocket?
     let scheme = 'ws';
@@ -83,6 +69,9 @@ export class STOMPService {
     // Configure client heartbeating
     this.client.heartbeat.incoming = this.config.heartbeat_in;
     this.client.heartbeat.outgoing = this.config.heartbeat_out;
+
+    // Auto reconnect
+    this.client.reconnect_delay = 5000;
 
     // Set function to debug print messages
     this.client.debug = this.config.debug || this.config.debug == null ? this.debug : null;
@@ -124,12 +113,6 @@ export class STOMPService {
 
     // Notify observers that we are disconnecting!
     this.state.next(STOMPState.DISCONNECTING);
-
-    // Abort reconnecting if in progress
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
 
     // Disconnect if connected. Callback will set CLOSED state
     if (this.client && this.client.connected) {
@@ -195,10 +178,7 @@ export class STOMPService {
 
     // Clear callback
     this.resolvePromise = null;
-
-    // Clear timer
-    this.timer = null;
-  }
+  };
 
 
   // Handle errors from stomp.js
@@ -216,14 +196,8 @@ export class STOMPService {
       // Reset state indicator
       this.state.next(STOMPState.CLOSED);
 
-      // Attempt reconnection
-      console.log('Reconnecting in 5 seconds...');
-      this.timer = setTimeout(() => {
-        this.configure();
-        this.try_connect();
-      }, 5000);
     }
-  }
+  };
 
 
   // On message RX, notify the Observable with the message object
