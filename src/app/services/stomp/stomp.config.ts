@@ -13,14 +13,10 @@ export interface StompConfig {
   user: string;
   pass: string;
 
-  // Which queues?
-  publish: string[];
-  subscribe: string[];
-
   // How often to heartbeat?
   heartbeat_in?: number;
   heartbeat_out?: number;
 
   // Enable client debugging?
   debug: boolean;
-};
+}

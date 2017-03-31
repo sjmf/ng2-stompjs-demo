@@ -7,9 +7,6 @@
     "user": "guest",
     "pass": "guest",
 
-    "subscribe": ["/topic/ng-demo-sub"],
-    "publish": ["/topic/ng-demo-sub"],
-
     "heartbeat_in": 0,
     "heartbeat_out": 20000,
 

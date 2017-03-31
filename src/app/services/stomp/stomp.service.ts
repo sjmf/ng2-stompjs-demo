@@ -13,7 +13,6 @@ export enum STOMPState {
   CLOSED,
   TRYING,
   CONNECTED,
-  SUBSCRIBED,
   DISCONNECTING
 }
 
@@ -34,21 +33,14 @@ export class STOMPService {
   // State of the STOMPService
   public state: BehaviorSubject<STOMPState>;
 
-  // Publishes new messages to Observers
-  public messages: Subject<Stomp.Message>;
-
   // Configuration structure with MQ creds
   private config: StompConfig;
 
   // STOMP Client from stomp.js
   private client: Stomp.Client;
 
-  // Resolve Promise made to calling class, when connected
-  private resolvePromise: (...args: any[]) => void;
-
   /** Constructor */
   public constructor(private _configService: ConfigService) {
-    this.messages = new Subject<Stomp.Message>();
     this.state = new BehaviorSubject<STOMPState>(STOMPState.CLOSED);
 
     // Get configuration from config service...
@@ -61,9 +53,8 @@ export class STOMPService {
     );
   }
 
-
   /** Set up configuration */
-  public configure(config?: StompConfig): void {
+  private configure(config?: StompConfig): void {
 
     this.config = config;
 
@@ -92,7 +83,7 @@ export class STOMPService {
    * Perform connection to STOMP broker, returning a Promise
    * which is resolved when connected.
    */
-  public try_connect(): void {
+  private try_connect(): void {
 
     if (this.state.getValue() !== STOMPState.CLOSED) {
       throw Error('Can\'t try_connect if not CLOSED!');
@@ -128,28 +119,27 @@ export class STOMPService {
     }
   }
 
-
   /** Send a message to all topics */
-  public publish(message?: string): void {
-
-    for (const t of this.config.publish) {
-      this.client.send(t, {}, message);
-    }
+  public publish(queueName: string, message?: string): void {
+    this.client.send(queueName, {}, message);
   }
 
-
   /** Subscribe to server message queues */
-  public subscribe(): void {
+  public subscribe(queueName: string): Subject<Stomp.Message> {
+    let messages: Subject<Stomp.Message>;
 
-    // Subscribe to our configured queues
-    for (const t of this.config.subscribe) {
-      this.client.subscribe(t, this.on_message, { ack: 'auto' });
-    }
+    messages = new Subject<Stomp.Message>();
+    this.state.subscribe((currentState: number) => {
+      if (currentState === STOMPState.CONNECTED) {
 
-    // Update the state
-    if (this.config.subscribe.length > 0) {
-      this.state.next(STOMPState.SUBSCRIBED);
-    }
+        this.client.subscribe(queueName, (message: Stomp.Message) => {
+            messages.next(message);
+          },
+          { ack: 'auto' });
+      }
+    });
+
+    return messages;
   }
 
 
@@ -159,7 +149,7 @@ export class STOMPService {
    * Note the method signature: () => preserves lexical scope
    * if we need to use this.x inside the function
    */
-  public debug(...args: any[]): void {
+  private debug(...args: any[]): void {
 
     // Push arguments to this function into console.log
     if (window.console && console.log && console.log.apply) {
@@ -167,28 +157,17 @@ export class STOMPService {
     }
   }
 
-
   // Callback run on successfully connecting to server
-  public on_connect = () => {
+  private on_connect = () => {
 
     console.log('Connected');
 
     // Indicate our connected state to observers
     this.state.next(STOMPState.CONNECTED);
-
-    // Subscribe to message queues
-    this.subscribe();
-
-    // Resolve our Promise to the caller
-    this.resolvePromise();
-
-    // Clear callback
-    this.resolvePromise = null;
   };
 
-
   // Handle errors from stomp.js
-  public on_error = (error: string | Stomp.Message) => {
+  private on_error = (error: string | Stomp.Message) => {
 
     if (typeof error === 'object') {
       error = (<Stomp.Message>error).body;
@@ -197,22 +176,9 @@ export class STOMPService {
     console.error(`Error: ${error}`);
 
     // Check for dropped connection and try reconnecting
-    if (error.indexOf('Lost connection') !== -1) {
-
+    if (!this.client.connected) {
       // Reset state indicator
       this.state.next(STOMPState.CLOSED);
-
     }
   };
-
-
-  // On message RX, notify the Observable with the message object
-  public on_message = (message: Stomp.Message) => {
-
-    if (message.body) {
-      this.messages.next(message);
-    } else {
-      console.error('Empty message received!');
-    }
-  }
 }
