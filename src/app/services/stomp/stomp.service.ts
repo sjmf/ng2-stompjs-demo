@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Subject } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { StompConfig } from './';
 
 import * as Stomp from '@stomp/stompjs';
-import {ConfigService} from "../config/config.service";
+import { ConfigService } from "../config/config.service";
 
 /** possible states for the STOMP service */
 export enum STOMPState {
@@ -23,12 +23,10 @@ export enum STOMPState {
  * message queue using the stomp.js library, and returns
  * values via the ES6 Observable specification for
  * asynchronous value streaming by wiring the STOMP
- * messages into a Subject observable.
+ * messages into a observable.
  */
 @Injectable()
 export class STOMPService {
-
-  /* Service parameters */
 
   // State of the STOMPService
   public state: BehaviorSubject<STOMPState>;
@@ -80,17 +78,9 @@ export class STOMPService {
 
 
   /**
-   * Perform connection to STOMP broker, returning a Promise
-   * which is resolved when connected.
+   * Perform connection to STOMP broker
    */
   private try_connect(): void {
-
-    if (this.state.getValue() !== STOMPState.CLOSED) {
-      throw Error('Can\'t try_connect if not CLOSED!');
-    }
-    if (this.client === null) {
-      throw Error('Client not configured!');
-    }
 
     // Attempt connection, passing in a callback
     this.client.connect(
@@ -105,7 +95,8 @@ export class STOMPService {
   }
 
 
-  /** Disconnect the STOMP client and clean up */
+  /** Disconnect the STOMP client and clean up,
+   * not sure how this method will get called, if ever */
   public disconnect(): void {
 
     // Notify observers that we are disconnecting!
@@ -125,21 +116,32 @@ export class STOMPService {
   }
 
   /** Subscribe to server message queues */
-  public subscribe(queueName: string): Subject<Stomp.Message> {
-    let messages: Subject<Stomp.Message>;
+  public subscribe(queueName: string): Observable<Stomp.Message> {
 
-    messages = new Subject<Stomp.Message>();
-    this.state.subscribe((currentState: number) => {
-      if (currentState === STOMPState.CONNECTED) {
+    /** Well the logic is complicated but works beautifully. RxJS is indeed wonderful.
+     *
+     * We need to activate the underlying subscription immediately if Stomp is connected. If not it should
+     * subscribe when it gets next connected. Further it should re establish the subscription whenever Stomp
+     * successfully reconnects.
+     *
+     * Actual implementation is simple, we filter the BehaviourSubject 'state' so that we can trigger whenever Stomp is
+     * connected. Since 'state' is a BehaviourSubject, if Stomp is already connected, it will immediately trigger.
+     *
+     * The observable that we return to caller remains same across all reconnects, so no special handling needed at
+     * the message subscriber.
+     */
+    console.log(`Request to subscribe ${queueName}`);
 
-        this.client.subscribe(queueName, (message: Stomp.Message) => {
-            messages.next(message);
-          },
-          { ack: 'auto' });
-      }
+    return Observable.create((messages) => {
+      this.state
+        .filter((currentState: number) => {return currentState === STOMPState.CONNECTED})
+        .subscribe(() => {
+          this.client.subscribe(queueName, (message: Stomp.Message) => {
+              messages.next(message);
+            },
+            {ack: 'auto'});
+        });
     });
-
-    return messages;
   }
 
 
@@ -149,13 +151,9 @@ export class STOMPService {
    * Note the method signature: () => preserves lexical scope
    * if we need to use this.x inside the function
    */
-  private debug(...args: any[]): void {
-
-    // Push arguments to this function into console.log
-    if (window.console && console.log && console.log.apply) {
-      console.log.apply(console, args);
-    }
-  }
+  private debug = (args): void => {
+      console.log(args);
+  };
 
   // Callback run on successfully connecting to server
   private on_connect = () => {

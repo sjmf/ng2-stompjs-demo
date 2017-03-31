@@ -3,9 +3,6 @@ import { Observable } from 'rxjs/Observable';
 import { Message } from '@stomp/stompjs';
 
 import { STOMPService } from '../../services/stomp';
-import {Subject} from "rxjs";
-
-import * as Stomp from '@stomp/stompjs';
 
 @Component({
   selector: 'app-rawdata',
@@ -16,7 +13,7 @@ import * as Stomp from '@stomp/stompjs';
 export class RawDataComponent implements OnInit, OnDestroy {
 
   // Stream of messages
-  public messages: Subject<Message>;
+  public messages: Observable<Message>;
 
   // Array of historic message (bodies)
   public mq: Array<string> = [];
@@ -61,6 +58,6 @@ export class RawDataComponent implements OnInit, OnDestroy {
     this.count++;
 
     // Log it to the console
-    console.log(this.messages);
+    console.log(message);
   }
 }
