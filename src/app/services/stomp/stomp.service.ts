@@ -90,7 +90,7 @@ export class STOMPService {
       this.on_error
     );
 
-    console.log('Connecting...');
+    this.debug('Connecting...');
     this.state.next(STOMPState.TRYING);
   }
 
@@ -130,7 +130,7 @@ export class STOMPService {
      * The observable that we return to caller remains same across all reconnects, so no special handling needed at
      * the message subscriber.
      */
-    console.log(`Request to subscribe ${queueName}`);
+    this.debug(`Request to subscribe ${queueName}`);
 
     return Observable.create((messages) => {
       this.state
@@ -158,7 +158,7 @@ export class STOMPService {
   // Callback run on successfully connecting to server
   private on_connect = () => {
 
-    console.log('Connected');
+    this.debug('Connected');
 
     // Indicate our connected state to observers
     this.state.next(STOMPState.CONNECTED);
