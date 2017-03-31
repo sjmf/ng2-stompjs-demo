@@ -72,7 +72,7 @@ export class STOMPService {
     this.client.heartbeat.outgoing = this.config.heartbeat_out;
 
     // Auto reconnect
-    this.client.reconnect_delay = 5000;
+    this.client.reconnect_delay = this.config.reconnect_delay;
 
     // Set function to debug print messages
     this.client.debug = this.config.debug || this.config.debug == null ? this.debug : null;

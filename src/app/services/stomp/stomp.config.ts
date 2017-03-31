@@ -14,8 +14,13 @@ export interface StompConfig {
   pass: string;
 
   // How often to heartbeat?
+  // Interval in milliseconds, set to 0 to disable
   heartbeat_in?: number;
   heartbeat_out?: number;
+
+  // Wait in milliseconds before attempting auto reconnect
+  // Set to 0 to disable
+  reconnect_delay: number
 
   // Enable client debugging?
   debug: boolean;
