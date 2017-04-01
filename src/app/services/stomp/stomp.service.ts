@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs/Rx';
+import {Observable, Subscription} from 'rxjs/Rx';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { StompConfig } from './';
 
 import * as Stomp from '@stomp/stompjs';
 import { ConfigService } from "../config/config.service";
+import {StompSubscription} from "@stomp/stompjs";
 
 /** possible states for the STOMP service */
 export enum STOMPState {
@@ -132,16 +133,48 @@ export class STOMPService {
      */
     this.debug(`Request to subscribe ${queueName}`);
 
-    return Observable.create((messages) => {
-      this.state
-        .filter((currentState: number) => {return currentState === STOMPState.CONNECTED})
-        .subscribe(() => {
-          this.client.subscribe(queueName, (message: Stomp.Message) => {
-              messages.next(message);
-            },
-            {ack: 'auto'});
-        });
-    });
+    let coldObservable = Observable.create(
+      (messages) => {
+        /**
+         * These variables will be used as part of the closure and work their magic during unsubscribe
+         */
+        let stompSubscription: StompSubscription;
+
+        let connectObservable: Observable<number> = this.state
+          .filter((currentState: number) => {
+            return currentState === STOMPState.CONNECTED
+          });
+
+        let stompConnectedSubscription: Subscription;
+
+        stompConnectedSubscription = connectObservable
+          .subscribe(() => {
+            this.debug(`Will subscribe to ${queueName}`);
+            stompSubscription = this.client.subscribe(queueName, (message: Stomp.Message) => {
+                messages.next(message);
+              },
+              {ack: 'auto'});
+          });
+
+        return () => { /* cleanup function, will be called when no subscribers are left */
+          this.debug(`Stop watching connection state (for ${queueName})`);
+          stompConnectedSubscription.unsubscribe();
+
+          if (this.state.getValue() === STOMPState.CONNECTED) {
+            this.debug(`Will unsubscribe from ${queueName} at Stomp`);
+            stompSubscription.unsubscribe();
+          } else {
+            this.debug(`Stomp not connected, no need to unsubscribe from ${queueName} at Stomp`);
+          }
+        }
+      });
+
+    /**
+     * Important - convert it to hot Observable - otherwise, if the user code subscribes
+     * to this observable twice, it will subscribe twice to Stomp broker. (This was happening in the current example,
+     * A long but good explanatory article at https://medium.com/@benlesh/hot-vs-cold-observables-f8094ed53339
+     */
+    return coldObservable.share();
   }
 
 
@@ -152,7 +185,7 @@ export class STOMPService {
    * if we need to use this.x inside the function
    */
   private debug = (args): void => {
-      console.log(args);
+      console.log(new Date(), args);
   };
 
   // Callback run on successfully connecting to server

@@ -128,9 +128,9 @@
     magic-string "^0.19.0"
     source-map "^0.5.6"
 
-"@stomp/stompjs@^2.5.0":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-2.5.1.tgz#31a218cec6084c7fbfcb3bb810de58bab4bf9285"
+"@stomp/stompjs@^2.5.3":
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-2.5.3.tgz#481b5cd22812368312e157a2544a2ffd7ba985c8"
   optionalDependencies:
     websocket latest
 

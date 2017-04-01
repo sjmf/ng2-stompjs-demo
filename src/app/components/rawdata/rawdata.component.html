@@ -1,7 +1,11 @@
 <app-status></app-status>
 
 <div id="raw">
-  <button class="btn btn-primary" (click)="onClick()">Send Test Message</button>
+  <button class="btn btn-primary" (click)="onSendMessage()">Send Test Message</button>
+  <button class="btn btn-primary" (click)="subscribe()" [disabled]="subscribed">Subscribe</button>
+  <button class="btn btn-primary" (click)="unsubscribe()" [disabled]="!subscribed">Unsubscribe</button>
+  <span *ngIf="subscribed">Subscribed</span>
+  <span *ngIf="!subscribed">Unsubscribed</span>
   <h2>Messages</h2>
   <p>{{count}} total</p>
 

@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Message } from '@stomp/stompjs';
 
 import { STOMPService } from '../../services/stomp';
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-rawdata',
@@ -13,7 +14,11 @@ import { STOMPService } from '../../services/stomp';
 export class RawDataComponent implements OnInit, OnDestroy {
 
   // Stream of messages
-  public messages: Observable<Message>;
+  private subscription: Subscription;
+  private messages: Observable<Message>;
+
+  // Subscription status
+  public subscribed: boolean;
 
   // Array of historic message (bodies)
   public mq: Array<string> = [];
@@ -27,19 +32,46 @@ export class RawDataComponent implements OnInit, OnDestroy {
   constructor(private _stompService: STOMPService) { }
 
   ngOnInit() {
+    this.subscribed = false;
+
     // Store local reference to Observable
     // for use with template ( | async )
+    this.subscribe();
+  }
 
-    this.messages= this._stompService.subscribe("/topic/ng-demo-sub");
+  public subscribe() {
+    if(this.subscribed) {
+      return;
+    }
+
+    // Stream of messages
+    this.messages = this._stompService.subscribe("/topic/ng-demo-sub");
 
     // Subscribe a function to be run on_next message
-    this.messages.subscribe(this.on_next);
+    this.subscription = this.messages.subscribe(this.on_next);
+
+    this.subscribed = true;
+  }
+
+  public unsubscribe() {
+    if(!this.subscribed) {
+      return;
+    }
+
+    // This will internally unsubscribe from Stomp Broker
+    // There are two subscriptions - one created explicitly, the other created in the template by use of 'async'
+    this.subscription.unsubscribe();
+    this.subscription = null;
+    this.messages = null;
+
+    this.subscribed = false;
   }
 
   ngOnDestroy() {
+    this.unsubscribe();
   }
 
-  public onClick() {
+  public onSendMessage() {
     const _getRandomInt = (min, max) => {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
