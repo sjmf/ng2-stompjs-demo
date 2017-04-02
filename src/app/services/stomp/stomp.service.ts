@@ -32,6 +32,9 @@ export class STOMPService {
   // State of the STOMPService
   public state: BehaviorSubject<STOMPState>;
 
+  // Will trigger when connection is established, will trigger immediately once if already connected
+  public connectObservable: Observable<number>;
+
   // Configuration structure with MQ creds
   private config: StompConfig;
 
@@ -41,6 +44,20 @@ export class STOMPService {
   /** Constructor */
   public constructor(private _configService: ConfigService) {
     this.state = new BehaviorSubject<STOMPState>(STOMPState.CLOSED);
+
+    this.connectObservable = this.state
+      .filter((currentState: number) => {
+        return currentState === STOMPState.CONNECTED
+      });
+
+    // Setup sending queuedMessages
+    this.connectObservable.subscribe(() => {
+      // The delay is just for testing during development, as I am publishing and subscribing same Stomp topic. the delaye
+      // ensures that when it starts publishing messages, the subscription should have been established.
+      setTimeout(()=>{
+        this.sendQueuedMessages();
+      }, 1000);
+    });
 
     // Get configuration from config service...
     this._configService.getConfig('api/config.json').then(
@@ -111,9 +128,33 @@ export class STOMPService {
     }
   }
 
-  /** Send a message to all topics */
+  public connected():boolean {
+    return this.state.getValue() === STOMPState.CONNECTED;
+  }
+
+  private queuedMessages: {queueName: string, message: string}[]= [];
+
+  /** Send a message, locally quque if not connected */
   public publish(queueName: string, message?: string): void {
-    this.client.send(queueName, {}, message);
+    if(this.connected()) {
+      this.client.send(queueName, {}, message);
+    } else {
+      this.debug(`Not connected, queueing ${message}`);
+      this.queuedMessages.push({queueName: queueName, message: message});
+    }
+  }
+
+  /** Send queued messages */
+  private sendQueuedMessages(): void {
+    let queuedMessages= this.queuedMessages;
+    this.queuedMessages = [];
+
+    this.debug(`Will try sending ququed messages ${queuedMessages}`);
+
+    for(let queuedMessage of queuedMessages) {
+      this.debug(`Attempting to send ${queuedMessage}`);
+      this.publish(queuedMessage.queueName, queuedMessage.message);
+    }
   }
 
   /** Subscribe to server message queues */
@@ -140,14 +181,9 @@ export class STOMPService {
          */
         let stompSubscription: StompSubscription;
 
-        let connectObservable: Observable<number> = this.state
-          .filter((currentState: number) => {
-            return currentState === STOMPState.CONNECTED
-          });
-
         let stompConnectedSubscription: Subscription;
 
-        stompConnectedSubscription = connectObservable
+        stompConnectedSubscription = this.connectObservable
           .subscribe(() => {
             this.debug(`Will subscribe to ${queueName}`);
             stompSubscription = this.client.subscribe(queueName, (message: Stomp.Message) => {
@@ -171,7 +207,7 @@ export class STOMPService {
 
     /**
      * Important - convert it to hot Observable - otherwise, if the user code subscribes
-     * to this observable twice, it will subscribe twice to Stomp broker. (This was happening in the current example,
+     * to this observable twice, it will subscribe twice to Stomp broker. (This was happening in the current example).
      * A long but good explanatory article at https://medium.com/@benlesh/hot-vs-cold-observables-f8094ed53339
      */
     return coldObservable.share();
