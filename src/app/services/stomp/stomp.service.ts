@@ -52,11 +52,7 @@ export class STOMPService {
 
     // Setup sending queuedMessages
     this.connectObservable.subscribe(() => {
-      // The delay is just for testing during development, as I am publishing and subscribing same Stomp topic. the delaye
-      // ensures that when it starts publishing messages, the subscription should have been established.
-      setTimeout(()=>{
-        this.sendQueuedMessages();
-      }, 1000);
+      this.sendQueuedMessages();
     });
 
     // Get configuration from config service...
@@ -134,7 +130,7 @@ export class STOMPService {
 
   private queuedMessages: {queueName: string, message: string}[]= [];
 
-  /** Send a message, locally quque if not connected */
+  /** Send a message, queue it locally if not connected */
   public publish(queueName: string, message?: string): void {
     if(this.connected()) {
       this.client.send(queueName, {}, message);
@@ -149,7 +145,7 @@ export class STOMPService {
     let queuedMessages= this.queuedMessages;
     this.queuedMessages = [];
 
-    this.debug(`Will try sending ququed messages ${queuedMessages}`);
+    this.debug(`Will try sending queued messages ${queuedMessages}`);
 
     for(let queuedMessage of queuedMessages) {
       this.debug(`Attempting to send ${queuedMessage}`);
