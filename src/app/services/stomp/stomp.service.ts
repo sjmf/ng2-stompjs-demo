@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import {Observable, Subscription} from 'rxjs/Rx';
+import { Observable, Subscription } from 'rxjs/Rx';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { StompConfig } from './';
 
 import * as Stomp from '@stomp/stompjs';
-import { ConfigService } from "../config/config.service";
-import {StompSubscription} from "@stomp/stompjs";
+import { ConfigService } from '../config/config.service';
+import { StompSubscription } from '@stomp/stompjs';
 
 /** possible states for the STOMP service */
 export enum STOMPState {
@@ -35,6 +35,8 @@ export class STOMPService {
   // Will trigger when connection is established, will trigger immediately once if already connected
   public connectObservable: Observable<number>;
 
+  private queuedMessages: {queueName: string, message: string}[]= [];
+
   // Configuration structure with MQ creds
   private config: StompConfig;
 
@@ -47,7 +49,7 @@ export class STOMPService {
 
     this.connectObservable = this.state
       .filter((currentState: number) => {
-        return currentState === STOMPState.CONNECTED
+        return currentState === STOMPState.CONNECTED;
       });
 
     // Setup sending queuedMessages
@@ -124,15 +126,13 @@ export class STOMPService {
     }
   }
 
-  public connected():boolean {
+  public connected(): boolean {
     return this.state.getValue() === STOMPState.CONNECTED;
   }
 
-  private queuedMessages: {queueName: string, message: string}[]= [];
-
   /** Send a message, queue it locally if not connected */
   public publish(queueName: string, message?: string): void {
-    if(this.connected()) {
+    if (this.connected()) {
       this.client.send(queueName, {}, message);
     } else {
       this.debug(`Not connected, queueing ${message}`);
@@ -142,12 +142,12 @@ export class STOMPService {
 
   /** Send queued messages */
   private sendQueuedMessages(): void {
-    let queuedMessages= this.queuedMessages;
+    const queuedMessages = this.queuedMessages;
     this.queuedMessages = [];
 
     this.debug(`Will try sending queued messages ${queuedMessages}`);
 
-    for(let queuedMessage of queuedMessages) {
+    for (const queuedMessage of queuedMessages) {
       this.debug(`Attempting to send ${queuedMessage}`);
       this.publish(queuedMessage.queueName, queuedMessage.message);
     }
@@ -170,7 +170,7 @@ export class STOMPService {
      */
     this.debug(`Request to subscribe ${queueName}`);
 
-    let coldObservable = Observable.create(
+    const coldObservable = Observable.create(
       (messages) => {
         /**
          * These variables will be used as part of the closure and work their magic during unsubscribe
@@ -198,7 +198,7 @@ export class STOMPService {
           } else {
             this.debug(`Stomp not connected, no need to unsubscribe from ${queueName} at Stomp`);
           }
-        }
+        };
       });
 
     /**

@@ -20,7 +20,7 @@ export interface StompConfig {
 
   // Wait in milliseconds before attempting auto reconnect
   // Set to 0 to disable
-  reconnect_delay: number
+  reconnect_delay: number;
 
   // Enable client debugging?
   debug: boolean;

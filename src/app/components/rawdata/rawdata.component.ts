@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Message } from '@stomp/stompjs';
 
 import { STOMPService } from '../../services/stomp';
-import {Subscription} from "rxjs";
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-rawdata',
@@ -15,7 +15,7 @@ export class RawDataComponent implements OnInit, OnDestroy {
 
   // Stream of messages
   private subscription: Subscription;
-  private messages: Observable<Message>;
+  public messages: Observable<Message>;
 
   // Subscription status
   public subscribed: boolean;
@@ -40,12 +40,12 @@ export class RawDataComponent implements OnInit, OnDestroy {
   }
 
   public subscribe() {
-    if(this.subscribed) {
+    if (this.subscribed) {
       return;
     }
 
     // Stream of messages
-    this.messages = this._stompService.subscribe("/topic/ng-demo-sub");
+    this.messages = this._stompService.subscribe('/topic/ng-demo-sub');
 
     // Subscribe a function to be run on_next message
     this.subscription = this.messages.subscribe(this.on_next);
@@ -54,7 +54,7 @@ export class RawDataComponent implements OnInit, OnDestroy {
   }
 
   public unsubscribe() {
-    if(!this.subscribed) {
+    if (!this.subscribed) {
       return;
     }
 
@@ -75,7 +75,8 @@ export class RawDataComponent implements OnInit, OnDestroy {
     const _getRandomInt = (min, max) => {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
-    this._stompService.publish("/topic/ng-demo-sub", `{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);
+    this._stompService.publish('/topic/ng-demo-sub',
+      `{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);
 
     this._counter++;
   }
