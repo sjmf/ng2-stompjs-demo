@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Message } from 'stompjs';
+import { Message } from '@stomp/stompjs';
 
 import { STOMPService } from '../../services/stomp';
-import { ConfigService } from '../../services/config/config.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-rawdata',
@@ -14,7 +14,11 @@ import { ConfigService } from '../../services/config/config.service';
 export class RawDataComponent implements OnInit, OnDestroy {
 
   // Stream of messages
+  private subscription: Subscription;
   public messages: Observable<Message>;
+
+  // Subscription status
+  public subscribed: boolean;
 
   // Array of historic message (bodies)
   public mq: Array<string> = [];
@@ -25,42 +29,56 @@ export class RawDataComponent implements OnInit, OnDestroy {
   private _counter = 1;
 
   /** Constructor */
-  constructor(private _stompService: STOMPService,
-    private _configService: ConfigService) { }
+  constructor(private _stompService: STOMPService) { }
 
   ngOnInit() {
-    // Get configuration from config service...
-    this._configService.getConfig('api/config.json').then(
-      config => {
-        // ... then pass it to (and connect) STOMP:
-        this._stompService.configure(config);
-        this._stompService.try_connect().then(this.on_connect);
-      }
-    );
-  }
-
-  ngOnDestroy() {
-    this._stompService.disconnect();
-  }
-
-  public onClick() {
-    const _getRandomInt = (min, max) => {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-    this._stompService.publish(`{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);
-
-    this._counter++;
-  }
-
-  /** Callback on_connect to queue */
-  public on_connect = () => {
+    this.subscribed = false;
 
     // Store local reference to Observable
     // for use with template ( | async )
-    this.messages = this._stompService.messages;
+    this.subscribe();
+  }
+
+  public subscribe() {
+    if (this.subscribed) {
+      return;
+    }
+
+    // Stream of messages
+    this.messages = this._stompService.subscribe('/topic/ng-demo-sub');
 
     // Subscribe a function to be run on_next message
-    this.messages.subscribe(this.on_next);
+    this.subscription = this.messages.subscribe(this.on_next);
+
+    this.subscribed = true;
+  }
+
+  public unsubscribe() {
+    if (!this.subscribed) {
+      return;
+    }
+
+    // This will internally unsubscribe from Stomp Broker
+    // There are two subscriptions - one created explicitly, the other created in the template by use of 'async'
+    this.subscription.unsubscribe();
+    this.subscription = null;
+    this.messages = null;
+
+    this.subscribed = false;
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe();
+  }
+
+  public onSendMessage() {
+    const _getRandomInt = (min, max) => {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    this._stompService.publish('/topic/ng-demo-sub',
+      `{ type: "Test Message", data: [ ${this._counter}, ${_getRandomInt(1, 100)}, ${_getRandomInt(1, 100)}] }`);
+
+    this._counter++;
   }
 
   /** Consume a message from the _stompService */
@@ -73,6 +91,6 @@ export class RawDataComponent implements OnInit, OnDestroy {
     this.count++;
 
     // Log it to the console
-    console.log(this.messages);
+    console.log(message);
   }
 }
